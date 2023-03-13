@@ -1,0 +1,28 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    container_name: "postgres"
+    environment:
+      POSTGRES_USER: auser
+      POSTGRES_PASSWORD: apassword
+      POSTGRES_DB: networkdb
+    ports:
+      - 5335:5432
+  adminer:
+    depends_on:
+      - db
+    build:
+      context: ./docker/adminer
+    container_name: "adminer"
+    image: adminer
+    environment:
+      - TZ=Europe/Paris
+      - ADMINER_DEFAULT_DB_HOST= PostgreSQL
+      - ADMINER_DEFAULT_DB_NAME= pongdb
+    restart: unless-stopped
+    ports:
+      - 5000:8080
