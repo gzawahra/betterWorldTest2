@@ -23,12 +23,17 @@ let NetworkController = class NetworkController {
         return this.networkService.getAllNetworks();
     }
     getNetworkByName(name) {
-        common_1.Logger.log('get by id number');
-        return null;
+        common_1.Logger.log('get by name');
+        return this.networkService.getNetworkByName(name);
     }
     getNetworkByCity(city) {
         common_1.Logger.log('get by city');
-        return null;
+        return this.networkService.getNetworkByCity(city);
+    }
+    createNetwork(json) {
+        common_1.Logger.log('get by city');
+        console.log(json);
+        return this.networkService.createNewNetwork(json);
     }
 };
 __decorate([
@@ -38,19 +43,26 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], NetworkController.prototype, "getAllUsers", null);
 __decorate([
-    (0, common_1.Get)('/:name'),
-    __param(0, (0, common_1.Param)('name', common_1.ParseIntPipe)),
+    (0, common_1.Get)('/name/:name'),
+    __param(0, (0, common_1.Param)('name')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], NetworkController.prototype, "getNetworkByName", null);
 __decorate([
-    (0, common_1.Get)('/:city'),
-    __param(0, (0, common_1.Param)('city', common_1.ParseIntPipe)),
+    (0, common_1.Get)('/city/:city'),
+    __param(0, (0, common_1.Param)('city')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], NetworkController.prototype, "getNetworkByCity", null);
+__decorate([
+    (0, common_1.Post)('/'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], NetworkController.prototype, "createNetwork", null);
 NetworkController = __decorate([
     (0, common_1.Controller)('network'),
     __metadata("design:paramtypes", [network_service_1.NetworkService])

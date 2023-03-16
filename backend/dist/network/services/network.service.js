@@ -17,26 +17,54 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const network_entity_1 = require("../entities/network.entity");
+const station_entity_1 = require("../entities/station.entity");
 const axios_1 = require("axios");
 let NetworkService = class NetworkService {
-    constructor(networkRepository) {
+    constructor(networkRepository, stationRepository) {
         this.networkRepository = networkRepository;
+        this.stationRepository = stationRepository;
     }
-    async getAllNetworks() {
-        console.log('get all networks');
+    async delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async syncNetworks() {
         const networks = [];
-        const tmp = await axios_1.default
+        let num = -1;
+        const tmpNetworks = await axios_1.default
             .get('http://api.citybik.es/v2/networks')
             .then((response) => {
-            return response.data;
+            num = response.data.networks.length;
+            console.log(num);
+            if (response.status != 200) {
+                console.log(response.status);
+                throw new common_1.HttpException("bad status", common_1.HttpStatus.TOO_MANY_REQUESTS);
+            }
+            return response.data.networks;
         })
             .catch((error) => {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.TOO_MANY_REQUESTS);
             console.log(error);
         });
-        tmp.networks.forEach(function (network) {
-            networks.push(network.id, network.name, network.href, network.company, network.location.city, network.location.country, null);
+        tmpNetworks.forEach(async (value) => {
+            if (await this.networkRepository.findOne({ where: { CityBikes_id: value.id } }) == null) {
+                if (value.id !== null && value.id !== undefined) {
+                    const tmpNetwork = await this.createNetwork();
+                    tmpNetwork.CityBikes_id = value.id;
+                    tmpNetwork.name = value.name;
+                    tmpNetwork.href = value.href;
+                    tmpNetwork.company = value.company;
+                    tmpNetwork.city = value.location.city;
+                    tmpNetwork.country = value.location.country;
+                    await this.updateNetwork(tmpNetwork.id, tmpNetwork);
+                    this.delay(100);
+                }
+            }
         });
-        return networks;
+        return num;
+    }
+    async getAllNetworks() {
+        this.syncNetworks();
+        return await this.networkRepository.find();
     }
     async createNetwork() {
         const network = this.networkRepository.create();
@@ -44,9 +72,25 @@ let NetworkService = class NetworkService {
             await this.networkRepository.save(network);
         }
         catch (error) {
+            console.log(network.CityBikes_id);
             throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
         }
         return network;
+    }
+    async createNewNetwork(json) {
+        if (json["name"] == null || json["country"] == null || json["city"] == null)
+            return common_1.HttpStatus.BAD_REQUEST;
+        let network = await this.networkRepository.findOne({ where: { name: json["name"] } }).then(async (value) => {
+            if (value == null)
+                value = await this.createNetwork();
+            return value;
+        });
+        network.name = json["name"];
+        network.company = json["compagny"];
+        network.city = json["city"];
+        network.country = json["country"];
+        this.updateNetwork(network.id, network);
+        return await this.networkRepository.findOne({ where: { id: network.id } });
     }
     async updateNetwork(id, network) {
         if (!network)
@@ -61,17 +105,19 @@ let NetworkService = class NetworkService {
         }
         return network;
     }
+    async getNetworkByCityBikeId(id) {
+        console.log(id);
+        return await this.networkRepository.findOne({ where: { CityBikes_id: id } });
+    }
     async getNetwork(id, reqrelations = []) {
         let network = null;
         if (id && reqrelations[0]) {
-            console.log('with');
             network = await this.networkRepository.findOne({
                 where: { id },
                 relations: reqrelations,
             });
         }
         else {
-            console.log('without');
             network = await this.networkRepository.findOne({ where: { id } });
         }
         if (!network) {
@@ -80,19 +126,94 @@ let NetworkService = class NetworkService {
         return network;
     }
     async getNetworkByName(name) {
-        return null;
+        return await this.networkRepository.findOne({ where: { name } });
     }
     async getNetworkByCity(city) {
-        return null;
+        return await this.networkRepository.findOne({ where: { city } });
+        ;
     }
-    async getStationByCountry(country) {
-        return null;
+    async getStation(id, reqrelations = []) {
+        let station = null;
+        if (id && reqrelations[0]) {
+            station = await this.stationRepository.findOne({
+                where: { id },
+                relations: reqrelations,
+            });
+        }
+        else {
+            station = await this.stationRepository.findOne({ where: { id } });
+        }
+        if (!station) {
+            throw new common_1.HttpException('station not found', common_1.HttpStatus.NOT_FOUND);
+        }
+        return station;
+    }
+    async syncStations() {
+        const networks = await this.networkRepository.find();
+        networks.forEach(async (network) => {
+            await axios_1.default
+                .get('http://api.citybik.es/v2/networks/' + network.CityBikes_id)
+                .then(async (response) => {
+                if (response.status == 200) {
+                    this.createStations(network, response);
+                }
+            })
+                .catch((error) => {
+                throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+            });
+        });
+    }
+    async createStations(network, response) {
+        if (response != null && response != undefined)
+            response.data.network.stations.forEach(async (value) => {
+                if (value.id != null && value.id != undefined) {
+                    let station = await this.stationRepository.findOne({ where: { CityBikes_id: value.id } });
+                    if (station == null) {
+                        station = this.stationRepository.create();
+                        await this.stationRepository.save(station);
+                    }
+                    try {
+                        station.network = network;
+                        station.CityBikes_id = value.id;
+                        station.name = value.name;
+                        station.country = network.country;
+                        station.longitude = value.longitude;
+                        station.latitude = value.latitude;
+                        station.empty_slots = value.empty_slots;
+                        if (station.empty_slots == null || station.empty_slots == undefined)
+                            station.empty_slots = 0;
+                        station.free_bikes = value.free_bikes;
+                        this.updateStation(station.id, station);
+                    }
+                    catch (error) {
+                        throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+                    }
+                }
+            });
+    }
+    async updateStation(id, station) {
+        if (!station)
+            throw new common_1.HttpException('Body null', common_1.HttpStatus.NOT_FOUND);
+        await this.getStation(id);
+        try {
+            station.id = id;
+            await this.stationRepository.update(id, station);
+        }
+        catch (error) {
+            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+        }
+        return station;
+    }
+    async getStationsByCountry(country) {
+        return await this.stationRepository.find({ where: { country } });
     }
 };
 NetworkService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(network_entity_1.Network)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(station_entity_1.Station)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], NetworkService);
 exports.NetworkService = NetworkService;
 //# sourceMappingURL=network.service.js.map

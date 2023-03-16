@@ -1,0 +1,21 @@
+
+html, body {
+  --toastify-color-light: rgba(50,50,50,0.3);
+  --toastify-color-dark: rgba(50,50,50,0.3);
+  --toastify-color-info: rgba(50,50,50,0.3);
+  --toastify-color-success: rgba(50,50,50,0.3);
+  --toastify-color-warning: rgba(50,50,50,0.3);
+  --toastify-color-error: rgba(50,50,50,0.3);
+  --toastify-text-color-dark: rgb(255,255,255);
+  --toastify-font-family: agency-fb;
+  --toastify-text-color-light: rgb(255,255,255);
+  --toastify-text-color-info: #fff;
+  --toastify-text-color-success: #fff;
+  --toastify-text-color-warning: #fff;
+  --toastify-text-color-error: #fff;
+  --toastify-color-progress-info: #aa4646;
+  --toastify-color-progress-success: rgb(170, 70, 70);
+  --toastify-color-progress-warning:rgb(170, 70, 70);
+  --toastify-color-progress-error: rgb(170, 70, 70);
+  --toastify-toast-width: 500px;
+}

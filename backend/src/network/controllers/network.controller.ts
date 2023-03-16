@@ -1,12 +1,16 @@
 import {
+  Body,
   Controller,
   Get,
+  HttpStatus,
   Logger,
   Param,
   ParseIntPipe,
+  Post,
   Res,
   StreamableFile,
 } from '@nestjs/common';
+import { HttpStatusCode } from 'axios';
 import { Network } from '../entities/network.entity';
 import { NetworkService } from '../services/network.service';
 @Controller('network')
@@ -16,20 +20,25 @@ export class NetworkController {
   getAllUsers(): Promise<Network[]> {
     return this.networkService.getAllNetworks();
   }
-  @Get('/:name')
+  @Get('/name/:name')
   getNetworkByName(
-    @Param('name', ParseIntPipe) name: string,
+    @Param('name') name: string,
   ): Promise<Network> {
-    Logger.log('get by id number');
+    Logger.log('get by name');
     // return this.networkService.getNetworkByName(name);
-    return null;
+    return this.networkService.getNetworkByName(name);
   }
-  @Get('/:city')
+  @Get('/city/:city')
   getNetworkByCity(
-    @Param('city', ParseIntPipe) city: number,
+    @Param('city') city: string,
   ): Promise<Network> {
     Logger.log('get by city');
-    // return this.networkService.getNetworkByCity(city);
-    return null;
+    return this.networkService.getNetworkByCity(city);
+  }
+  @Post('/')
+    createNetwork(@Body() json: JSON): Promise<Network | HttpStatus>{
+    Logger.log('get by city');
+    console.log(json)
+    return this.networkService.createNewNetwork(json);
   }
 }

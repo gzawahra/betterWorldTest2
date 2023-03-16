@@ -12,12 +12,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const network_controller_1 = require("./controllers/network.controller");
 const network_service_1 = require("./services/network.service");
 const network_entity_1 = require("./entities/network.entity");
+const station_entity_1 = require("./entities/station.entity");
+const station_controller_1 = require("./controllers/station.controller");
 let NetworkModule = class NetworkModule {
 };
 NetworkModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([network_entity_1.Network])],
-        controllers: [network_controller_1.NetworkController],
+        imports: [typeorm_1.TypeOrmModule.forFeature([network_entity_1.Network, station_entity_1.Station])],
+        controllers: [network_controller_1.NetworkController, station_controller_1.StationController],
         providers: [network_service_1.NetworkService],
         exports: [network_service_1.NetworkService],
     })

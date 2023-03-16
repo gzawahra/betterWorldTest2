@@ -1,0 +1,1139 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Pong",
+    "description": "PONG Server API Docs.",
+    "version": "2.0",
+    "contact": {
+      "email": "gizawahr@student.42.fr"
+    }
+  },
+  "tags": [
+    {
+      "name": "network",
+      "description": "Everything about the networks"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "connection": {
+            "$ref": "#/components/schemas/Connection"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/Avatar"
+          },
+          "username": {
+            "type": "string",
+            "example": "dimitri"
+          },
+          "profileCompleted": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "rank": {
+            "type": "number",
+            "example": 100
+          },
+          "followed": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "example": [
+              65255,
+              65350
+            ]
+          },
+          "blocked": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "example": [
+              65243,
+              65379
+            ]
+          },
+          "status": {
+            "type": "number",
+            "example": 1
+          },
+          "won": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Match"
+            }
+          },
+          "lost": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Match"
+            }
+          }
+        }
+      },
+      "TextChannel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "user": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Log"
+            }
+          },
+          "name": {
+            "type": "string",
+            "example": "les bgs"
+          },
+          "public": {
+            "type": "boolean",
+            "example": "false"
+          },
+          "password": {
+            "type": "string",
+            "example": "password"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/User"
+          },
+          "adminId": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "example": [
+              65000,
+              65350
+            ]
+          },
+          "muted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MutedUser"
+            }
+          },
+          "banned": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BannedUser"
+            }
+          }
+        }
+      },
+      "DMChannel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "user": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "log": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Log"
+            }
+          }
+        }
+      },
+      "BannedUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "endOfBan": {
+            "type": "string",
+            "example": "2022-06-29"
+          },
+          "room": {
+            "$ref": "#/components/schemas/TextChannel"
+          }
+        }
+      },
+      "MutedUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "endOfMute": {
+            "type": "string",
+            "example": "2022-06-29"
+          },
+          "room": {
+            "$ref": "#/components/schemas/TextChannel"
+          }
+        }
+      },
+      "Avatar": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 65000
+          },
+          "filename": {
+            "type": "string",
+            "example": "image.png"
+          },
+          "data": {
+            "type": "string",
+            "format": "bytea"
+          }
+        }
+      },
+      "Log": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "message": {
+            "type": "string",
+            "example": "salut"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "Password": {
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "type": "string",
+            "example": "oldpass"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newpass"
+          }
+        }
+      },
+      "Match": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "score": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "example": [
+              2,
+              5
+            ]
+          },
+          "date": {
+            "type": "string",
+            "example": "2022-06-29"
+          },
+          "winner": {
+            "$ref": "#/components/schemas/User"
+          },
+          "loser": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "Connection": {
+        "type": "object",
+        "properties": {
+          "42": {
+            "type": "number",
+            "example": 65000
+          },
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "otp": {
+            "type": "string",
+            "example": "DMBEA62FLR5UGNSD"
+          }
+        }
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "JWT Token is invalid or empty"
+      },
+      "OK": {
+        "description": "Expected response"
+      },
+      "UnauthorizedValue": {
+        "description": "You tried to modify a value you don't have access to"
+      },
+      "UserNotExist": {
+        "description": "User does not exist"
+      },
+      "ChannelNotExist": {
+        "description": "Channel does not exist"
+      },
+      "AvatarNotExist": {
+        "description": "Avatar does not exist"
+      },
+      "NotExist": {
+        "description": "User and / or Channel does not exist"
+      },
+      "ValueNotSpecified": {
+        "description": "One value that was requiered was not specified"
+      },
+      "GameroomNotExist": {
+        "description": "Gameroom does not exist"
+      },
+      "DatabaseError": {
+        "description": "There was an error in the database"
+      },
+      "AlreadyExist": {
+        "description": "Entity already exists in the object"
+      }
+    }
+  },
+  "paths": {
+    "/auth/2fa": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The current user creates a 2fa authentification",
+        "operationId": "IdController_Create2FA",
+        "parameters": [],
+        "requestBody": {
+          "description": "New code for 2fa",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": 123456
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedValue"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExist"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The current user deletes his 2fa authentification",
+        "operationId": "IdController_Delete2FA",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/auth/otp": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "The current user generates a new JWT for 2fa",
+        "operationId": "IdController_loginOTP",
+        "parameters": [],
+        "requestBody": {
+          "description": "Old JWT token and 2fa code",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "example": "ey.eyJzdWIiOiI2MDUzMiIsImlhdCI6MTY0Nzg3OTkwMiwiZXh"
+                  },
+                  "code": {
+                    "type": "string",
+                    "example": 123456
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedValue"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExist"
+          }
+        }
+      }
+    },
+    "/auth/jwt": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Checks if the JWT is valid or not, returns a boolean",
+        "operationId": "AuthController_jwt",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          }
+        }
+      }
+    },
+    "/auth/42/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Authentificate with 42 oauth then generates a JWT returned in the URL",
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "$ref": "#/components/responses/OK"
+          }
+        }
+      }
+    },
+    "/auth/2fa/qrcode": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the 2fa QR code for the current user",
+        "operationId": "AuthController_get2FA",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedValue"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExist"
+          }
+        }
+      }
+    },
+    "/auth/generate/{id}": {
+      "get": {
+        "tags": [
+          "testing"
+        ],
+        "summary": "Generates a JWT token for the user (specified by id), if that user doesn't exist it will get created",
+        "operationId": "AuthController_generateJWT",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          }
+        }
+      }
+    },
+    "/pong/{id}": {
+      "get": {
+        "tags": [
+          "pong"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns the Gameroom the user is in (specified by id)",
+        "operationId": "MeController_getRoomForUser",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/GameroomNotExist"
+          }
+        }
+      }
+    },
+    "/channel": {
+      "post": {
+        "tags": [
+          "channel me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The current user creates a channel object",
+        "operationId": "IdController_createChannel",
+        "parameters": [],
+        "requestBody": {
+          "description": "New channel object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "le gang"
+                  },
+                  "public": {
+                    "type": "boolean",
+                    "example": "false"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedValue"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      }
+    },
+    "/channel/{id}/change": {
+      "post": {
+        "tags": [
+          "channel me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Modifies the channel object (specified by id) (more specifically the password)",
+        "operationId": "IdController_changePass",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the channel",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "New password object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Password"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedValue"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotExist"
+          }
+        }
+      }
+    },
+    "/channel/": {
+      "get": {
+        "tags": [
+          "channel id"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns all the channels objects of the server (some information is excluded)",
+        "operationId": "IdController_getAllChannels",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/user/me": {
+      "get": {
+        "tags": [
+          "user me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns the current user object",
+        "operationId": "MeController_getUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Modifies the current user object",
+        "operationId": "MeController_updateUser",
+        "parameters": [],
+        "requestBody": {
+          "description": "Updated user object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "dimitri"
+                  },
+                  "followed": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "example": [
+                      65255,
+                      65350
+                    ]
+                  },
+                  "blocked": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "example": [
+                      65243,
+                      65379
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedValue"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      }
+    },
+    "/user/me/avatar": {
+      "get": {
+        "tags": [
+          "user me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns the current user's avatar",
+        "operationId": "MeController_getAvatar",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Expected response",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Modifies the current user's avatar",
+        "operationId": "MeController_updateAvatar",
+        "parameters": [],
+        "requestBody": {
+          "description": "Updated avatar",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "description": "new Avatar",
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          },
+          "406": {
+            "$ref": "#/components/responses/AvatarNotExist"
+          }
+        }
+      }
+    },
+    "/user/me/block/{id}": {
+      "put": {
+        "tags": [
+          "user me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Modifies the current user's object (more specifically the blocked array)",
+        "operationId": "MeController_blockUser",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Id of the user you wish to block",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "example": 65000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      }
+    },
+    "/user/me/follow/{id}": {
+      "put": {
+        "tags": [
+          "user me"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Modifies the current user's object (more specifically the followed array)",
+        "operationId": "MeController_followUser",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Id of the user you wish to follow",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "example": 65000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/DatabaseError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "user id"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns all the users of the server",
+        "operationId": "IdController_getAllUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": [
+          "user id"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns the user object (specified by id)",
+        "operationId": "IdController_getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      }
+    },
+    "/user/{id}/avatar": {
+      "get": {
+        "tags": [
+          "user id"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns the user's avatar (specified by id)",
+        "operationId": "IdController_getAvatar",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expected response",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      }
+    },
+    "/user/matches/{id}": {
+      "get": {
+        "tags": [
+          "user id"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Returns the user's matches (specified by id)",
+        "operationId": "IdController_getMatches",
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Id of the user",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/UserNotExist"
+          }
+        }
+      }
+    }
+  }
+}

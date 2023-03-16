@@ -11,8 +11,8 @@ import { Station } from './station.entity';
 export class Network {
   @PrimaryGeneratedColumn()
   id: number;
-  @PrimaryColumn()
-  CityBikes_id: number;
+  @Column({nullable: true})
+  CityBikes_id: string;
   @Column({ default: null })
   name: string;
   @Column({ default: null })
@@ -24,5 +24,5 @@ export class Network {
   @Column({ default: null })
   country: string;
   @OneToMany(() => Station, (station) => station.network)
-  station: Station[];
+  stations: Station[];
 }

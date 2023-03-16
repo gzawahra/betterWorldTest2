@@ -21,15 +21,31 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ default: null }),
     __metadata("design:type", String)
+], Station.prototype, "CityBikes_id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: null }),
+    __metadata("design:type", String)
 ], Station.prototype, "name", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: null }),
+    __metadata("design:type", String)
+], Station.prototype, "country", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: null, type: 'float' }),
     __metadata("design:type", Number)
-], Station.prototype, "lattitude", void 0);
+], Station.prototype, "latitude", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: null, type: 'float' }),
+    __metadata("design:type", Number)
+], Station.prototype, "longitude", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: null }),
     __metadata("design:type", Number)
-], Station.prototype, "longitude", void 0);
+], Station.prototype, "empty_slots", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: null }),
+    __metadata("design:type", Number)
+], Station.prototype, "free_bikes", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => network_entity_1.Network, { eager: true, onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)(),
